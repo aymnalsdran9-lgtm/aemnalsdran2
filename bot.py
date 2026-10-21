@@ -1,10 +1,9 @@
 import os
-import asyncio
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-# التوكن الخاص بك
 TOKEN = os.environ.get("BOT_TOKEN", "8549143434:AAFqOee_MH3qFLF-AFy6dhs5uQlFPVTTCjY")
+WEB_APP_URL = "https://aymnalsdran5-max.github.io/aemn2bot/"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_name = update.effective_user.first_name
@@ -15,11 +14,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"نتمنى لك تجربة ممتعة! ❤️"
     )
 
-    keyboard = [
+    # 1. زر شفاف (Inline Button) يفتح المتجر كتطبيق مصغر داخل تليجرام
+    inline_keyboard = [
         [
             InlineKeyboardButton(
                 "📱 فتح متجر التطبيقات", 
-                url="https://aymnalsdran5-max.github.io/aemn2bot/"
+                web_app=WebAppInfo(url=WEB_APP_URL)
             )
         ],
         [
@@ -30,10 +30,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
     ]
 
+    # 2. زر ثابت أسفل الشاشة بجانب خانة الكتابة (Menu Button / Keyboard Button)
+    reply_keyboard = [
+        [
+            KeyboardButton(
+                text="📱 فتح متجر التطبيقات", 
+                web_app=WebAppInfo(url=WEB_APP_URL)
+            )
+        ]
+    ]
+
+    # إرسال الرسالة مع الأزرار
     await update.message.reply_text(
         text=welcome_text,
-        reply_markup=InlineKeyboardMarkup(keyboard),
+        reply_markup=InlineKeyboardMarkup(inline_keyboard),
         parse_mode="Markdown"
+    )
+
+    # إضافة الزر السفلي لخانة المحادثة
+    await update.message.reply_text(
+        text="يمكنك أيضاً فتح المتجر في أي وقت من الزر بالأسفل 👇",
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
     )
 
 def main():
