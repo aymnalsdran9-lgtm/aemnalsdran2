@@ -1,4 +1,5 @@
 import os
+import time
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes
 
@@ -14,7 +15,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"نتمنى لك تجربة ممتعة! ❤️"
     )
 
-    # 1. زر شفاف (Inline Button) يفتح المتجر كتطبيق مصغر داخل تليجرام
     inline_keyboard = [
         [
             InlineKeyboardButton(
@@ -30,7 +30,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
     ]
 
-    # 2. زر ثابت أسفل الشاشة بجانب خانة الكتابة (Menu Button / Keyboard Button)
     reply_keyboard = [
         [
             KeyboardButton(
@@ -40,24 +39,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
     ]
 
-    # إرسال الرسالة مع الأزرار
     await update.message.reply_text(
         text=welcome_text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard),
         parse_mode="Markdown"
     )
 
-    # إضافة الزر السفلي لخانة المحادثة
     await update.message.reply_text(
         text="يمكنك أيضاً فتح المتجر في أي وقت من الزر بالأسفل 👇",
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
     )
 
 def main():
-    app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    print("البوت يعمل بنجاح...")
-    app.run_polling()
+    while True:
+        try:
+            app = Application.builder().token(TOKEN).build()
+            app.add_handler(CommandHandler("start", start))
+            print("البوت يعمل الآن وجاهز للاستقبال...")
+            app.run_polling(drop_pending_updates=True)
+        except Exception as e:
+            print(f"حدث خطأ، إعادة المحاولة خلال 5 ثوانٍ: {e}")
+            time.sleep(5)
 
 if __name__ == "__main__":
     main()
